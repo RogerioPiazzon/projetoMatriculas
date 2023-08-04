@@ -57,7 +57,15 @@ goto :VERIFYRESOURCES
 
 
 :VERIFYRESOURCES
-echo Iniciando script para extracao de informacoes...
+echo Criando ambiente virtual...
+IF EXIST %mypath:~0,-1%\env RMDIR /S /Q %mypath:~0,-1%\env
+python -m venv %mypath:~0,-1%\env
+%mypath:~0,-1%\env\scripts\python.exe -m pip install --upgrade pip
+call %mypath:~0,-1%\env\Scripts\activate.bat
+echo Instalando pacotes necessarios...
+pip install -r %mypath:~0,-1%\requirements.txt
+
+if not exist "%mypath:~0,-1%\resultado" md "%mypath:~0,-1%\resultado"
 goto:SELECTCREGISTRY
 
 
@@ -79,7 +87,7 @@ for /f "usebackq delims=" %%I in (`powershell %psCommand%`) do set "folder=%%I"
 setlocal enabledelayedexpansion
 echo Analisando os arquivos da pasta !folder!
 
-python teste.py "%cartorio%" !folder!
+call %mypath:~0,-1%\env\Scripts\python.exe  %mypath:~0,-1%\src\information_extraction.py "%cartorio%" !folder!
 
 
 endlocal

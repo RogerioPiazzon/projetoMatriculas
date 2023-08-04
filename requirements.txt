@@ -2,3 +2,8 @@ pandas
 numpy
 pytesseract
 PyMuPDF
+opencv-python
+pdf2image
+tika-app
+datetime
+openpyxl

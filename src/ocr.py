@@ -5,11 +5,14 @@ import pytesseract
 import sys
 import cv2
 import fitz
+import os
 
 from tikapp import TikaApp
 from pdf2image import convert_from_path
 
-tika_client = TikaApp(file_jar="tika-app-1.20.jar")
+print(f"{os.path.dirname(sys.argv[0])}\\tika-app-1.20.jar")
+
+tika_client = TikaApp(file_jar=f"{os.path.dirname(sys.argv[0])}\\tika-app-1.20.jar")
 
 def Average(lst):
     return round(sum(lst) / len(lst),2)
@@ -75,26 +78,3 @@ def transformFile(path):
         convert_pdf_pytesseract(path)
     else:
         convert_Tika(path)
-
-
-# def main(path_files: str, tesseract_tika: bool = True):
-#     """
-#     path_files: caminho onde os arquivos .pdf se encontram
-#     Os arquivos serão transformados no mesmo local e salvos com a extensão .txt
-#     """
-#     file_list = glob.glob(path_files + "/**/*.pdf", recursive=True)
-#     counter = len(file_list)
-#     for PDF_FILE_PATH in file_list:
-#         print("Faltam {:.2f}%".format(100 * (counter / len(file_list))))
-#         try:
-#             if tesseract_tika:
-#                 convert_pdf_pytesseract(PDF_FILE_PATH)
-#             else:
-#                 convert_Tika(PDF_FILE_PATH)
-#             counter -= 1
-#         except Exception as e:
-#             print(e)
-
-
-# if __name__ == "__main__":
-#     main(sys.argv[1])
