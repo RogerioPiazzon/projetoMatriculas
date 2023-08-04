@@ -1,0 +1,1 @@
+SELECT * FROM padroes_informacoes where cartorio = 

@@ -1,0 +1,1 @@
+SELECT campo FROM colunas_tabelas where nome_tabela = 'geral' or nome_tabela = 
