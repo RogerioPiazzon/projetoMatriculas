@@ -41,6 +41,10 @@ def main_load(
     df_patterns = load_data_excel(excel_path)
     df_name_variables = load_columns_table(name_table)
     df_patterns = df_patterns[df_patterns["cartorio"] == registry]
+    if len(df_patterns) == 0 :
+        print(f"Padrão não encontrado para o cartorio {registry}")
+        print(f"Por favor, verifique o arquivo de padrões em {excel_path}")
+        return None
     dic_data = {}
     for row in df_patterns.to_dict("records"):
         dic_data[row["descrição"]] = {k: row[k] for k in COLUMNS}
@@ -56,7 +60,11 @@ def extract_information(registry: str, path_files: str):
 
     Retorna um dataframe que pode ser transformado em um excel ou inserido na base de dados
     """
+    if len(registry) == 0:
+        registry = "GERAL"
     dict_data = main_load(registry)
+    if dict_data is None:
+        return None
     list_files = glob(path_files, recursive=True)
     new_rows = []
     for f in list_files:
@@ -94,7 +102,6 @@ def extract_information(registry: str, path_files: str):
 
 #%%
 def main(registry: str, path_files: str):
-    print(registry,path_files,PARENT_PATH)
     pdf_files = glob(f"{path_files}/*.pdf", recursive=True)
     for file in pdf_files:
         transformFile(file)
@@ -105,4 +112,5 @@ def main(registry: str, path_files: str):
 if __name__ == "__main__":
     df_result = main(sys.argv[1], sys.argv[2].replace("\\", "\/"))
     date_now = datetime.now().strftime("%m%d%Y%H%M%S")
-    df_result.to_excel(f"{PARENT_PATH}/resultado/processamento_{date_now}.xlsx", index=False)
+    if df_result is not None:
+        df_result.to_excel(f"{PARENT_PATH}/resultado/processamento_{date_now}.xlsx", index=False)

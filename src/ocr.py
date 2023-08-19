@@ -10,7 +10,7 @@ import os
 from tikapp import TikaApp
 from pdf2image import convert_from_path
 
-print(f"{os.path.dirname(sys.argv[0])}\\tika-app-1.20.jar")
+# print(f"{os.path.dirname(sys.argv[0])}\\tika-app-1.20.jar")
 
 tika_client = TikaApp(file_jar=f"{os.path.dirname(sys.argv[0])}\\tika-app-1.20.jar")
 
@@ -74,6 +74,7 @@ def convert_Tika(PDF_FILE_PATH):
 
 
 def transformFile(path):
+    print(f"Convertendo {path}")
     if classifier(path):
         convert_pdf_pytesseract(path)
     else:
