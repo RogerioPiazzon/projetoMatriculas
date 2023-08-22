@@ -68,8 +68,8 @@ def extract_information(registry: str, path_files: str):
         return None
     list_files = glob(path_files, recursive=True)
     new_rows = []
-    for f in list_files:
-        print("Extracting information from ", f)
+    for i,f in enumerate(list_files):
+        print("     [" + str(i+1)+"/"+str(len(list_files))+"]Analisando", f.replace("\/", "\\"))
         text = re.sub(
             r"\s+", " ", " ".join([l for l in open(f, "r", encoding="utf-8")])
         )
@@ -117,3 +117,4 @@ if __name__ == "__main__":
     date_now = datetime.now().strftime("%m%d%Y%H%M%S")
     if df_result is not None:
         df_result.to_excel(f"{PARENT_PATH}/resultado/processamento_{date_now}.xlsx", index=False)
+        print("     Analise realizada com sucesso, resultado salvo em ",f"{PARENT_PATH}/resultado/processamento_{date_now}.xlsx")

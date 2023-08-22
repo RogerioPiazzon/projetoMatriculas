@@ -47,7 +47,7 @@ goto check_Permissions
     exit /b
 
 :success_validation
-    echo  [VALIDACOES] 
+    echo  [PREPARACAO] 
     set /a "counter=%i%-1"
     for /l %%a in (0 , 1, %counter%) do (
         echo    PASSO %%a - !validation_msgs[%%a]! - OK !
@@ -87,77 +87,84 @@ goto check_Permissions
     goto :EOF
 
 :PYTHON_DOES_NOT_EXIST
-echo     Python nao localizado!
-echo     Procurando arquivo de instalacao...
-if not exist "%mypath:~0,-1%\resource\python-3.10.9-amd64.exe" (
-    if not exist  "%userprofile%\Downloads\python-3.10.9-amd64.exe" ( 
-        echo     Arquivo de instalacao nao encontrado
-        echo     Iniciando download...
-        start "" "https://www.python.org/ftp/python/3.10.9/python-3.10.9-amd64.exe"
-        echo     Caso o download nao tiver sido iniciado por favor, acesse "https://www.python.org/ftp/python/3.10.9/python-3.10.9-amd64.exe" e faca o download do python
-        pause
-        ) else (
-            start /d "%userprofile%\Downloads\" python-3.10.9-amd64.exe  InstallAllUsers=1 PrependPath=1 Include_test=0
-        )
-) else (
-    start /d "%mypath:~0,-1%\resource\" python-3.10.9-amd64.exe  InstallAllUsers=1 PrependPath=1 Include_test=0
-)
-goto :DOES_PYTHON_EXIST
+    echo     Python nao localizado!
+    echo     Procurando arquivo de instalacao...
+    if not exist "%mypath:~0,-1%\resource\python-3.10.9-amd64.exe" (
+        if not exist  "%userprofile%\Downloads\python-3.10.9-amd64.exe" ( 
+            echo     Arquivo de instalacao nao encontrado
+            echo     Iniciando download...
+            start "" "https://www.python.org/ftp/python/3.10.9/python-3.10.9-amd64.exe"
+            echo     Caso o download nao tiver sido iniciado por favor, acesse "https://www.python.org/ftp/python/3.10.9/python-3.10.9-amd64.exe" e faca o download do python
+            pause
+            ) else (
+                start /d "%userprofile%\Downloads\" python-3.10.9-amd64.exe  InstallAllUsers=1 PrependPath=1 Include_test=0
+            )
+    ) else (
+        start /d "%mypath:~0,-1%\resource\" python-3.10.9-amd64.exe  InstallAllUsers=1 PrependPath=1 Include_test=0
+    )
+    goto :DOES_PYTHON_EXIST
 
 :PYTHON_DOES_EXIST
-for /f "delims=" %%V in ('python -V') do @set ver=%%V
-echo     Python instalado!
-goto :VERIFYRESOURCES
+    for /f "delims=" %%V in ('python -V') do @set ver=%%V
+    echo     Python instalado!
+    goto :VERIFYRESOURCES
 
 
 :VERIFYRESOURCES
-set i=2
-set name_step=Baixando bibliotecas e criando ambiente virtual
-call :step_validation
-IF EXIST %mypath:~0,-1%\env RMDIR /S /Q %mypath:~0,-1%\env
-python -m venv %mypath:~0,-1%\env
-%mypath:~0,-1%\env\scripts\python.exe -m pip install --upgrade pip
-call %mypath:~0,-1%\env\Scripts\activate.bat
-echo     Instalando pacotes necessarios...
-pip install -r %mypath:~0,-1%\requirements.txt
+    if not exist "%mypath:~0,-1%\resultado" md "%mypath:~0,-1%\resultado"
+    set i=2
+    set name_step=Baixando bibliotecas e criando ambiente virtual
+    call :step_validation
+    for /f "skip=5 tokens=1,2,4 delims= " %%a in (
+    'dir /ad /tc "%mypath:~0,-1%\env\."') do IF "%%c"=="." (
+        set "dt=%%a"
+    )
+    if %dt% == %date% (
+        set i=3
+        goto :SELECTCREGISTRY
+    )
+    else (
+        goto :DOWN_CREAT_ENV
+    )
 
-if not exist "%mypath:~0,-1%\resultado" md "%mypath:~0,-1%\resultado"
+:DOWN_CREAT_ENV
+    IF EXIST %mypath:~0,-1%\env RMDIR /S /Q %mypath:~0,-1%\env
+    python -m venv %mypath:~0,-1%\env
+    %mypath:~0,-1%\env\scripts\python.exe -m pip install --upgrade pip
+    call %mypath:~0,-1%\env\Scripts\activate.bat
+    echo     Instalando pacotes necessarios...
+    pip install -r %mypath:~0,-1%\requirements.txt
     set i=3
     goto:SELECTCREGISTRY
 
 :SELECTCREGISTRY
-set e=0
-set nome_params=CARTORIO
-set /p input= "    Qual o cartorio origem do documento? (default: GERAL) :"
-if "%input%"=="" (
-    set params=GERAL
-) else (
-    set params=%input%
-)
-set cartorio=%params%
-call :status_execution
-@REM echo Cartorio selecionado "%cartorio%"
-goto :SELECTPATH
+    cls
+    set e=0
+    call :header
+    set nome_params=CARTORIO
+    set /p input= "    Qual o cartorio origem do documento? (default: GERAL) :"
+    if "%input%"=="" (
+        set params=GERAL
+    ) else (
+        set params=%input%
+    )
+    set cartorio=%params%
+    call :status_execution
+    goto :SELECTPATH
 
 
 :SELECTPATH
-echo     Selecione uma pasta para analise
-setlocal
-
-set "psCommand="(new-object -COM 'Shell.Application')^
-.BrowseForFolder(0,'Selecione a pasta com os arquivos para analise.',0,0).self.path""
-
-for /f "usebackq delims=" %%I in (`powershell %psCommand%`) do set "folder=%%I"
-
-setlocal enabledelayedexpansion
-echo Analisando os arquivos da pasta !folder!
-
-set e=1
-set nome_params=PASTA
-set params=!folder!
-call :status_execution
-
-goto :DOES_DOWNLOAD_PARAMS
+    echo     Selecione uma pasta para analise
+    setlocal
+    set "psCommand="(new-object -COM 'Shell.Application').BrowseForFolder(0,'Selecione a pasta com os arquivos para analise.',0,0).self.path""
+    for /f "usebackq delims=" %%I in (`powershell %psCommand%`) do set "folder=%%I"
+    setlocal enabledelayedexpansion
+    echo Analisando os arquivos da pasta !folder!
+    set e=1
+    set nome_params=PASTA
+    set params=!folder!
+    call :status_execution
+    goto :DOES_DOWNLOAD_PARAMS
 
 
 :DOES_DOWNLOAD_PARAMS
@@ -171,7 +178,7 @@ goto :DOES_DOWNLOAD_PARAMS
     )
     set down=%params%
     call :status_execution
-    
+    echo      Executando analise...      
     call %mypath:~0,-1%\env\Scripts\python.exe  %mypath:~0,-1%\src\information_extraction.py "%cartorio%" !folder! "%down%"
 
 
