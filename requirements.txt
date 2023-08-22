@@ -7,3 +7,4 @@ pdf2image
 tika-app
 datetime
 openpyxl
+gdown

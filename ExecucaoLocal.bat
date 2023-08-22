@@ -15,14 +15,25 @@ goto check_Permissions
     echo                        permissoes de Administrador.                         
     echo  ============================================================================
     call :success_validation
+    if "%e%" NEQ "" (
+        call :success_execution
+    )
     exit /b
 
 :status_execution
     call :header
-    set execution_msgs[%i%]=%name_step%
-    echo    PASSO %e% - %exec_step% - EM ANDAMENTO
+    set execution_msgs[%e%].TASK=%nome_params%
+    set execution_msgs[%e%].VALUE=%params%
+    echo    %nome_params%:%params%
     exit /b
 
+:success_execution
+    echo  [EXECUCAO] 
+    set /a "counter=%e%-1"
+    for /l %%a in (0 , 1, %counter%) do (
+        echo    !execution_msgs[%%a].TASK!:!execution_msgs[%%a].VALUE!
+    )
+    exit /b
 
 :step_validation
     call :header
@@ -76,14 +87,14 @@ goto check_Permissions
     goto :EOF
 
 :PYTHON_DOES_NOT_EXIST
-echo Python nao localizado!
-echo Procurando arquivo de instalacao...
+echo     Python nao localizado!
+echo     Procurando arquivo de instalacao...
 if not exist "%mypath:~0,-1%\resource\python-3.10.9-amd64.exe" (
     if not exist  "%userprofile%\Downloads\python-3.10.9-amd64.exe" ( 
-        echo Arquivo de instalacao nao encontrado
-        echo Iniciando download...
+        echo     Arquivo de instalacao nao encontrado
+        echo     Iniciando download...
         start "" "https://www.python.org/ftp/python/3.10.9/python-3.10.9-amd64.exe"
-        echo Caso o download nao tiver sido iniciado por favor, acesse "https://www.python.org/ftp/python/3.10.9/python-3.10.9-amd64.exe" e faca o download do python
+        echo     Caso o download nao tiver sido iniciado por favor, acesse "https://www.python.org/ftp/python/3.10.9/python-3.10.9-amd64.exe" e faca o download do python
         pause
         ) else (
             start /d "%userprofile%\Downloads\" python-3.10.9-amd64.exe  InstallAllUsers=1 PrependPath=1 Include_test=0
@@ -95,7 +106,7 @@ goto :DOES_PYTHON_EXIST
 
 :PYTHON_DOES_EXIST
 for /f "delims=" %%V in ('python -V') do @set ver=%%V
-echo Python instalado!
+echo     Python instalado!
 goto :VERIFYRESOURCES
 
 
@@ -107,7 +118,7 @@ IF EXIST %mypath:~0,-1%\env RMDIR /S /Q %mypath:~0,-1%\env
 python -m venv %mypath:~0,-1%\env
 %mypath:~0,-1%\env\scripts\python.exe -m pip install --upgrade pip
 call %mypath:~0,-1%\env\Scripts\activate.bat
-echo Instalando pacotes necessarios...
+echo     Instalando pacotes necessarios...
 pip install -r %mypath:~0,-1%\requirements.txt
 
 if not exist "%mypath:~0,-1%\resultado" md "%mypath:~0,-1%\resultado"
@@ -117,14 +128,20 @@ if not exist "%mypath:~0,-1%\resultado" md "%mypath:~0,-1%\resultado"
 :SELECTCREGISTRY
 set e=0
 set nome_params=CARTORIO
-set /p params= "    Qual o cartorio origem do documento? (default: GERAL) :"
+set /p input= "    Qual o cartorio origem do documento? (default: GERAL) :"
+if "%input%"=="" (
+    set params=GERAL
+) else (
+    set params=%input%
+)
+set cartorio=%params%
 call :status_execution
-echo Cartorio selecionado "%cartorio%"
+@REM echo Cartorio selecionado "%cartorio%"
 goto :SELECTPATH
 
 
 :SELECTPATH
-echo Selecione uma pasta para analise
+echo     Selecione uma pasta para analise
 setlocal
 
 set "psCommand="(new-object -COM 'Shell.Application')^
@@ -135,7 +152,27 @@ for /f "usebackq delims=" %%I in (`powershell %psCommand%`) do set "folder=%%I"
 setlocal enabledelayedexpansion
 echo Analisando os arquivos da pasta !folder!
 
-call %mypath:~0,-1%\env\Scripts\python.exe  %mypath:~0,-1%\src\information_extraction.py "%cartorio%" !folder!
+set e=1
+set nome_params=PASTA
+set params=!folder!
+call :status_execution
+
+goto :DOES_DOWNLOAD_PARAMS
+
+
+:DOES_DOWNLOAD_PARAMS
+    set e=2
+    set nome_params=DOWNLOAD_PARAMETROS
+    set /p input= "    Deseja fazer o download dos parametros carregados no google Drive? [Y/N]: (Default Y)"
+    if "%input%"=="" (
+        set params=Y
+    ) else (
+        set params=%input%
+    )
+    set down=%params%
+    call :status_execution
+    
+    call %mypath:~0,-1%\env\Scripts\python.exe  %mypath:~0,-1%\src\information_extraction.py "%cartorio%" !folder! "%down%"
 
 
 endlocal

@@ -7,6 +7,7 @@ import sys
 from ocr import transformFile
 import os
 from datetime import datetime
+from download_parametros import downloadparams
 #%%
 # colunas que constam da tabela com as expressões regulares
 COLUMNS = ["lower_bound", "upper_bound", "group", "re.I", "multiple", "padrao"]
@@ -110,6 +111,8 @@ def main(registry: str, path_files: str):
 
 
 if __name__ == "__main__":
+    if sys.argv[2] == "Y":
+        downloadparams(PARENT_PATH)
     df_result = main(sys.argv[1], sys.argv[2].replace("\\", "\/"))
     date_now = datetime.now().strftime("%m%d%Y%H%M%S")
     if df_result is not None:
