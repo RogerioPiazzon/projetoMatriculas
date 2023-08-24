@@ -148,7 +148,7 @@ goto check_Permissions
 
 :INSTALL_TESSERACT
     set i=3
-    set name_step=Instalando Tesseract...
+    set name_step=Instalando Tesseract
     call :step_validation
     echo       Confirme as etapas na tela...      
     start %mypath:~0,-1%\resource\tesseract-ocr-w64-setup-5.3.1.20230401.exe
@@ -156,9 +156,10 @@ goto check_Permissions
 
 :INSERTPATHENV
     set i=4
-    set name_step=Ajustando variaveis de ambiente..
+    set name_step=Ajustando variaveis de ambiente
     call :step_validation
     SET=PATH="%PATH%;%mypath:~0,-1%\resource\poppler-23.08.0\Library\bin;%ProgramFiles%\Tesseract-OCR;%ProgramFiles(x86)%\Tesseract-OCR"
+    set i=5
     goto:SELECTCREGISTRY
 
 :SELECTCREGISTRY
