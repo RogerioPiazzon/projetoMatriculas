@@ -103,7 +103,7 @@ def extract_information(registry: str, path_files: str):
 
 #%%
 def main(registry: str, path_files: str):
-    pdf_files = glob(f"{path_files}/*.pdf", recursive=True)
+    pdf_files = glob(f"{path_files}/*.*", recursive=True)
     for file in pdf_files:
         transformFile(file)
     

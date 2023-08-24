@@ -115,26 +115,50 @@ goto check_Permissions
     set i=2
     set name_step=Baixando bibliotecas e criando ambiente virtual
     call :step_validation
-    for /f "skip=5 tokens=1,2,4 delims= " %%a in (
-    'dir /ad /tc "%mypath:~0,-1%\env\."') do IF "%%c"=="." (
+    for /f "skip=5 tokens=1,2,4 delims= " %%a in ('dir /ad /tc "%mypath:~0,-1%\env\."') do IF "%%c"=="." (
         set "dt=%%a"
     )
     if %dt% == %date% (
-        set i=3
-        goto :SELECTCREGISTRY
+        goto :CHECKTESSERACT
     )
     else (
         goto :DOWN_CREAT_ENV
     )
 
 :DOWN_CREAT_ENV
-    IF EXIST %mypath:~0,-1%\env RMDIR /S /Q %mypath:~0,-1%\env
+    IF EXIST %mypath:~0,-1%\env RMDIR /S /Q %mypath:~0,-1%\env ELSE md %mypath:~0,-1%\env
     python -m venv %mypath:~0,-1%\env
     %mypath:~0,-1%\env\scripts\python.exe -m pip install --upgrade pip
     call %mypath:~0,-1%\env\Scripts\activate.bat
     echo     Instalando pacotes necessarios...
     pip install -r %mypath:~0,-1%\requirements.txt
+    goto:CHECKTESSERACT
+
+
+:CHECKTESSERACT
     set i=3
+    set name_step=Instalando Tesseract...
+    call :step_validation
+    IF EXIST %ProgramFiles%\Tesseract-OCR IF exist %ProgramFiles%\Tesseract-OCR (
+        goto:INSERTPATHENV
+    )
+    else (
+        goto:INSTALL_TESSERACT
+    )
+
+:INSTALL_TESSERACT
+    set i=3
+    set name_step=Instalando Tesseract...
+    call :step_validation
+    echo       Confirme as etapas na tela...      
+    start %mypath:~0,-1%\resource\tesseract-ocr-w64-setup-5.3.1.20230401.exe
+    goto:CHECKTESSERACT
+
+:INSERTPATHENV
+    set i=4
+    set name_step=Ajustando variaveis de ambiente..
+    call :step_validation
+    SET=PATH="%PATH%;%mypath:~0,-1%\resource\poppler-23.08.0\Library\bin;%ProgramFiles%\Tesseract-OCR;%ProgramFiles(x86)%\Tesseract-OCR"
     goto:SELECTCREGISTRY
 
 :SELECTCREGISTRY
