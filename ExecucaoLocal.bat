@@ -115,9 +115,14 @@ goto check_Permissions
     set i=2
     set name_step=Baixando bibliotecas e criando ambiente virtual
     call :step_validation
-    for /f "skip=5 tokens=1,2,4 delims= " %%a in ('dir /ad /tc "%mypath:~0,-1%\env\."') do IF "%%c"=="." (
+    IF exist "%mypath:~0,-1%\env\." ( 
+            for /f "skip=5 tokens=1,2,4 delims= " %%a in ('dir /ad /tc "%mypath:~0,-1%\env\."') do IF "%%c"=="." (
         set "dt=%%a"
     )
+    ) ELSE ( 
+        set "dt=19991020"
+        )
+
     if %dt% == %date% (
         goto :CHECKTESSERACT
     )

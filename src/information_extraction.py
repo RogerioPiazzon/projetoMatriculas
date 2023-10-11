@@ -71,7 +71,7 @@ def extract_information(registry: str, path_files: str):
     for i,f in enumerate(list_files):
         print("     [" + str(i+1)+"/"+str(len(list_files))+"]Analisando", f.replace("\/", "\\"))
         text = re.sub(
-            r"\s+", " ", " ".join([l for l in open(f, "r", encoding="utf-8")])
+            r"\s+", " ", " ".join([l for l in open(f, "r", encoding="ISO-8859-1")])
         )
         res = {"arquivo": f, "texto_completo": text}
         for k, dic in dict_data.items():
@@ -101,6 +101,7 @@ def extract_information(registry: str, path_files: str):
         new_rows.append(res)
     return pd.DataFrame(new_rows)
 
+#PDF,JPG, JPEG E PNG
 #%%
 def main(registry: str, path_files: str):
     pdf_files = glob(f"{path_files}/*.*", recursive=True)
