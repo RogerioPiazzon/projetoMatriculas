@@ -115,11 +115,11 @@ goto check_Permissions
     set i=2
     set name_step=Baixando bibliotecas e criando ambiente virtual
     call :step_validation
-    IF exist "%mypath:~0,-1%\env\." ( 
+    if exist "%mypath:~0,-1%\env\." ( 
             for /f "skip=5 tokens=1,2,4 delims= " %%a in ('dir /ad /tc "%mypath:~0,-1%\env\."') do IF "%%c"=="." (
-        set "dt=%%a"
-    )
-    ) ELSE ( 
+                set "dt=%%a"
+            )
+    ) else ( 
         set "dt=19991020"
         )
 
@@ -163,7 +163,7 @@ goto check_Permissions
     set i=4
     set name_step=Ajustando variaveis de ambiente
     call :step_validation
-    SET=PATH="%PATH%;%mypath:~0,-1%\resource\poppler-23.08.0\Library\bin;%ProgramFiles%\Tesseract-OCR;%ProgramFiles(x86)%\Tesseract-OCR"
+    SET PATH="%PATH%;%mypath:~0,-1%\resource\poppler-23.08.0\Library\bin;%ProgramFiles%\Tesseract-OCR;%ProgramFiles(x86)%\Tesseract-OCR"
     set i=5
     goto:SELECTCREGISTRY
 
@@ -187,7 +187,7 @@ goto check_Permissions
     echo     Selecione uma pasta para analise
     setlocal
     set "psCommand="(new-object -COM 'Shell.Application').BrowseForFolder(0,'Selecione a pasta com os arquivos para analise.',0,0).self.path""
-    for /f "usebackq delims=" %%I in (`powershell %psCommand%`) do set "folder=%%I"
+    for /f "usebackq delims=" %%I in (` start /B powershell %psCommand%`) do set "folder=%%I"
     setlocal enabledelayedexpansion
     echo Analisando os arquivos da pasta !folder!
     set e=1

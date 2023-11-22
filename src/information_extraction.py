@@ -8,10 +8,12 @@ from ocr import transformFile
 import os
 from datetime import datetime
 from download_parametros import downloadparams
+import shutil
+import pathlib
 #%%
 # colunas que constam da tabela com as expressões regulares
 COLUMNS = ["lower_bound", "upper_bound", "group", "re.I", "multiple", "padrao"]
-PARENT_PATH = os.path.dirname(os.path.dirname(sys.argv[0]))
+PARENT_PATH = pathlib.Path(__file__).parent.resolve().parent.resolve()
 
 #%%
 def load_columns_table(
@@ -35,7 +37,7 @@ def load_data_excel(excel_path: str):
 
 def main_load(
     registry,
-    excel_path: str = f"{PARENT_PATH}/docs/padroes_informações.xlsx",
+    excel_path: str = os.path.join(PARENT_PATH,"/docs/","padroes_informações.xlsx"),
     name_table: str = "informacoes_matriculas",
 ):
     "Carrega os padrões na forma de um dicionário para serem utilizados na extração de informações"
@@ -104,11 +106,16 @@ def extract_information(registry: str, path_files: str):
 #PDF,JPG, JPEG E PNG
 #%%
 def main(registry: str, path_files: str):
-    pdf_files = glob(f"{path_files}/*.*", recursive=True)
+    pdf_files =  glob(f"{path_files}/*.*", recursive=True)
     for file in pdf_files:
-        transformFile(file)
+        print(file)
+        if file.endswith('txt'):
+            shutil.move(file, path_files +'/converted_files/')
+        else:
+            transformFile(file)
     
-    return extract_information(registry,path_files + "/**/*.txt")
+    
+    return extract_information(registry,path_files +'/converted_files/' + "/**/*.txt")
 
 
 if __name__ == "__main__":

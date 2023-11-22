@@ -8,3 +8,5 @@ tika-app
 datetime
 openpyxl
 gdown
+unidecode 
+pillow
