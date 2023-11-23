@@ -75,7 +75,7 @@ class InfoExtract():
         list_files = glob(path_files, recursive=True)
         new_rows = []
         for i,f in enumerate(list_files):
-            print("     [" + str(i+1)+"/"+str(len(list_files))+"]Analisando", f.replace("\/", "\\"))
+            print("[" + str(i+1)+"/"+str(len(list_files))+"] Analisando", os.path.basename(f))
             text = re.sub(
                 r"\s+", " ", " ".join([l for l in open(f, "r", encoding="ISO-8859-1")])
             )
@@ -111,10 +111,8 @@ class InfoExtract():
 
         extension = pathlib.Path(filename).suffix
         if extension.lower() in ['.pdf']:
-            print(f"Convertendo o arquivo {os.path.basename(filename)}")
             arq = ocr_module.pdf_file(filename)
         elif extension.lower() in ['.jpeg','.png']:
-            print(f"Convertendo o arquivo {os.path.basename(filename)}")
             arq = ocr_module.img_file(filename)
         elif extension.lower() in ['.txt']:
             arq = filename
@@ -138,7 +136,8 @@ class InfoExtract():
             else:
                 output_path = path_files
                 for path, subdirs, files in os.walk(path_files):
-                    for name in files:
+                    for i,name in enumerate(files):
+                        print("[" + str(i+1)+"/"+str(len(files))+"] Processando", name)
                         file_txt = self.__convert_to_txt(os.path.join(path, name))
                         if file_txt != None:
                             utils_module.create_folder(os.path.join(path_files,'use_files'))
