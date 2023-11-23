@@ -1,15 +1,10 @@
 """MÓDULO PARA PROCESSAMENTO DOS DADOS E EXTRAÇÃO DE INFORMAÇÕES"""
-from glob import glob
+import re,os,sys,shutil,pathlib
 import pandas as pd
-import re
-import sys
+from glob import glob
+from datetime import datetime
 from ocr import ocr_module
 from utils import utils_module
-import os
-from datetime import datetime
-from download_parametros import downloadparams
-import shutil
-import pathlib
 
 PARENT_PATH = pathlib.Path(__file__).parent.resolve().parent.resolve()
 
@@ -108,11 +103,12 @@ class InfoExtract():
         return pd.DataFrame(new_rows)
     
     def __convert_to_txt(self,filename):
-
+        arq = None
         extension = pathlib.Path(filename).suffix
         if extension.lower() in ['.pdf']:
-            arq = ocr_module.pdf_file(filename)
-        elif extension.lower() in ['.jpeg','.png']:
+            if utils_module.check_pdf(filename):
+                arq = ocr_module.pdf_file(filename)
+        elif extension.lower() in ['.jpeg','.png','.jpg']:
             arq = ocr_module.img_file(filename)
         elif extension.lower() in ['.txt']:
             arq = filename
@@ -128,6 +124,7 @@ class InfoExtract():
 
             if os.path.isfile(path_files):
                 parent,filename = os.path.split(os.path.abspath(path_files))
+                print("[1/1] Processando", filename)
                 output_path = parent
                 utils_module.create_folder(os.path.join(parent,'use_files'))
                 file_txt = self.__convert_to_txt(os.path.join(parent,filename))
@@ -156,9 +153,5 @@ class InfoExtract():
 if __name__ == "__main__":
     obj_extract = InfoExtract()
     if sys.argv[2] == "Y":
-        downloadparams(PARENT_PATH)
-    df_result = obj_extract.extrair_dados(sys.argv[1], os.path.abspath(sys.argv[2]))
-    date_now = datetime.now().strftime("%m%d%Y%H%M%S")
-    if df_result is not None:
-        df_result.to_excel(f"{PARENT_PATH}/resultado/processamento_{date_now}.xlsx", index=False)
-        print("     Analise realizada com sucesso, resultado salvo em ",f"{PARENT_PATH}/resultado/processamento_{date_now}.xlsx")
+        utils_module.download_params(PARENT_PATH)
+    obj_extract.extrair_dados(sys.argv[1], os.path.abspath(sys.argv[2]))

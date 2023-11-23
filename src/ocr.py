@@ -1,18 +1,10 @@
 """MÓDULO PARA PROCESSAMENTO DOS ARQUIVOS PDF EM TXT"""
-import glob
-import numpy as np
-import pytesseract
-import sys
-import cv2
-import fitz
-import os
-
+import pytesseract,cv2,fitz,os,pathlib
 from tikapp import TikaApp
 from pdf2image import convert_from_path
 from unidecode import unidecode
 from utils import utils_module
 from PIL import Image
-import pathlib
 
 class Ocr():
     tika_client = TikaApp(file_jar=f"{pathlib.Path(__file__).parent.resolve()}\\tika-app-1.20.jar")
