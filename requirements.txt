@@ -11,3 +11,4 @@ gdown
 unidecode 
 pillow
 PyPDF2
+logging

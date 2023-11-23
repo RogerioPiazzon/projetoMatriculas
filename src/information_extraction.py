@@ -70,6 +70,7 @@ class InfoExtract():
         list_files = glob(path_files, recursive=True)
         new_rows = []
         for i,f in enumerate(list_files):
+            utils_module.log(f"Analisando {os.path.basename(f)}")
             print("[" + str(i+1)+"/"+str(len(list_files))+"] Analisando", os.path.basename(f))
             text = re.sub(
                 r"\s+", " ", " ".join([l for l in open(f, "r", encoding="ISO-8859-1")])
@@ -105,21 +106,24 @@ class InfoExtract():
     def __convert_to_txt(self,filename):
         arq = None
         extension = pathlib.Path(filename).suffix
-        if extension.lower() in ['.pdf']:
-            if utils_module.check_pdf(filename):
-                arq = ocr_module.pdf_file(filename)
-        elif extension.lower() in ['.jpeg','.png','.jpg']:
-            arq = ocr_module.img_file(filename)
-        elif extension.lower() in ['.txt']:
-            arq = filename
-        else:
-            print(f"Formato de arquivo não suportado: {extension}")
+        if os.path.exists(filename):
+            if extension.lower() in ['.pdf']:
+                if utils_module.check_pdf(filename):
+                    utils_module.log(f"Convertendo {os.path.basename(filename)}")
+                    arq = ocr_module.pdf_file(filename)
+            elif extension.lower() in ['.jpeg','.png','.jpg']:
+                utils_module.log(f"Convertendo {os.path.basename(filename)}")
+                arq = ocr_module.img_file(filename)
+            elif extension.lower() in ['.txt']:
+                arq = filename
+            else:
+                print(f"Formato de arquivo não suportado: {extension}")
         return arq
 
     def extrair_dados(self,
                       registry: str, 
                       path_files: str):
-        
+        utils_module.log("Inicio execução")
         if os.path.exists(path_files):
 
             if os.path.isfile(path_files):

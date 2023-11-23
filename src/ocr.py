@@ -7,7 +7,7 @@ from utils import utils_module
 from PIL import Image
 
 class Ocr():
-    tika_client = TikaApp(file_jar=f"{pathlib.Path(__file__).parent.resolve()}\\tika-app-1.20.jar")
+    tika_client = TikaApp(file_jar=f"{pathlib.Path(__file__).parent.resolve().parent.resolve()}\\resource\\tika-app-1.20.jar")
 
     def average(self,
                 lst):
@@ -57,7 +57,7 @@ class Ocr():
 
     def img_file(self,IMG_FILE_PATH):
         path,file = os.path.split(os.path.abspath(IMG_FILE_PATH))
-        output = path + "/converted_files/"+file.replace(".pdf", ".txt")
+        output = path + "/converted_files/"+file.lower().replace(".pdf", ".txt")
 
         utils_module.create_folder(path + "/converted_files/")
 
@@ -86,7 +86,7 @@ class Ocr():
                 os.remove(filename)
 
             path,file = os.path.split(os.path.abspath(PDF_FILE_PATH))
-            output = path + "/converted_files/"+file.replace(".pdf", ".txt")
+            output = path + "/converted_files/"+file.lower().replace(".pdf", ".txt")
             utils_module.create_folder(path + "/converted_files/")
 
             arq = open(output, "w")
