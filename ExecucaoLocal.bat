@@ -163,7 +163,13 @@ goto check_Permissions
     set i=4
     set name_step=Ajustando variaveis de ambiente
     call :step_validation
+    IF EXIST %ProgramFiles%\Tesseract-OCR (
+        xcopy /Y "%mypath:~0,-1%\resource\por.traineddata" "%ProgramFiles%\Tesseract-OCR\tessdata\"
+    ) ELSE (
+        xcopy /Y "%mypath:~0,-1%\resource\por.traineddata" "%ProgramFiles(x86)%\Tesseract-OCR\tessdata\"
+    )
     SET PATH="%PATH%;%mypath:~0,-1%\resource\poppler-23.08.0\Library\bin;%ProgramFiles%\Tesseract-OCR;%ProgramFiles(x86)%\Tesseract-OCR"
+    pause
     set i=5
     goto:SELECTCREGISTRY
 

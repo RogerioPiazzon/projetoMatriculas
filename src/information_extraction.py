@@ -125,7 +125,9 @@ class InfoExtract():
                       path_files: str):
         utils_module.log("Inicio execução")
         if os.path.exists(path_files):
-
+            if os.path.exists(os.path.join(parent,'use_files')):
+                shutil.rmtree(os.path.join(parent,'use_files'))
+                
             if os.path.isfile(path_files):
                 parent,filename = os.path.split(os.path.abspath(path_files))
                 print("[1/1] Processando", filename)
