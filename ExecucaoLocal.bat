@@ -122,16 +122,15 @@ goto check_Permissions
     ) else ( 
         set "dt=19991020"
         )
-
     if %dt% == %date% (
         goto :CHECKTESSERACT
-    )
-    else (
+        
+    ) else (
         goto :DOWN_CREAT_ENV
     )
 
 :DOWN_CREAT_ENV
-    IF EXIST %mypath:~0,-1%\env RMDIR /S /Q %mypath:~0,-1%\env ELSE md %mypath:~0,-1%\env
+    IF EXIST "%mypath:~0,-1%\env" RMDIR /S /Q "%mypath:~0,-1%\env" ELSE md "%mypath:~0,-1%\env"
     python -m venv %mypath:~0,-1%\env
     %mypath:~0,-1%\env\scripts\python.exe -m pip install --upgrade pip
     call %mypath:~0,-1%\env\Scripts\activate.bat
@@ -142,14 +141,16 @@ goto check_Permissions
 
 :CHECKTESSERACT
     set i=3
-    set name_step=Instalando Tesseract...
+    set name_step=Verificando instalacao do Tesseract...
     call :step_validation
-    IF EXIST %ProgramFiles%\Tesseract-OCR IF exist %ProgramFiles%\Tesseract-OCR (
+    set allpgrfiles=0
+    if EXIST "%ProgramFiles%\Tesseract-OCR" set allpgrfiles=1
+    if EXIST "%ProgramFiles(x86)%\Tesseract-OCR" set allpgrfiles=1
+    IF defined allpgrfiles (
         goto:INSERTPATHENV
-    )
-    else (
-        goto:INSTALL_TESSERACT
-    )
+        ) ELSE (
+            goto:INSTALL_TESSERACT
+            )
 
 :INSTALL_TESSERACT
     set i=3
@@ -163,13 +164,12 @@ goto check_Permissions
     set i=4
     set name_step=Ajustando variaveis de ambiente
     call :step_validation
-    IF EXIST %ProgramFiles%\Tesseract-OCR (
-        xcopy /Y "%mypath:~0,-1%\resource\por.traineddata" "%ProgramFiles%\Tesseract-OCR\tessdata\"
-    ) ELSE (
-        xcopy /Y "%mypath:~0,-1%\resource\por.traineddata" "%ProgramFiles(x86)%\Tesseract-OCR\tessdata\"
-    )
+    IF EXIST "%ProgramFiles%\Tesseract-OCR" (
+        xcopy /Y /q /s  "%mypath:~0,-1%\resource\por.traineddata" "%ProgramFiles%\Tesseract-OCR\tessdata\"
+        ) ELSE (
+            xcopy /Y /q /s  "%mypath:~0,-1%\resource\por.traineddata" "%ProgramFiles(x86)%\Tesseract-OCR\tessdata\"
+            )
     SET PATH="%PATH%;%mypath:~0,-1%\resource\poppler-23.08.0\Library\bin;%ProgramFiles%\Tesseract-OCR;%ProgramFiles(x86)%\Tesseract-OCR"
-    pause
     set i=5
     goto:SELECTCREGISTRY
 
